@@ -2,7 +2,8 @@ import bcrypt from "bcryptjs";
 import { prisma } from "~/db.server";
 
 import { createCookieSessionStorage, json, redirect } from "@remix-run/node";
-import type { LoginForm, RegisterForm } from "./types.server";
+
+import type { User } from "@prisma/client";
 import { createUser } from "./user.server";
 
 const sessionSecret = process.env.SESSION_SECRET;
@@ -32,21 +33,19 @@ export async function createUserSession(userId: string, redirectTo: string) {
   });
 }
 
-export async function register(user: RegisterForm) {
+export async function register(
+  user: Pick<User, "email" | "firstName" | "lastName" | "password">
+) {
   const exists = await prisma.user.count({ where: { email: user.email } });
   if (exists) {
-    return json(
-      { error: `User already exists with that email` },
-      { status: 400 }
-    );
+    return json({ error: `user-exists` }, { status: 400 });
   }
 
   const newUser = await createUser(user);
   if (!newUser) {
     return json(
       {
-        error: `Something went wrong trying to create a new user.`,
-        fields: { email: user.email, password: user.password },
+        error: `cannot-create-user`,
       },
       { status: 400 }
     );
@@ -55,7 +54,10 @@ export async function register(user: RegisterForm) {
   return createUserSession(newUser.id, "/");
 }
 
-export async function login({ email, password }: LoginForm) {
+export async function login({
+  email,
+  password,
+}: Pick<User, "email" | "password">) {
   const user = await prisma.user.findUnique({
     where: { email },
   });
@@ -74,7 +76,7 @@ export async function requireUserId(
   const userId = session.get("userId");
   if (!userId || typeof userId !== "string") {
     const searchParams = new URLSearchParams([["redirectTo", redirectTo]]);
-    throw redirect(`/login?${searchParams}`);
+    throw redirect(`/auth?${searchParams}`);
   }
   return userId;
 }
@@ -109,9 +111,18 @@ export async function getUser(request: Request) {
 
 export async function logout(request: Request) {
   const session = await getUserSession(request);
-  return redirect("/login", {
+  const user = await getUser(request);
+
+  return redirect("/auth/login" + user ? "?email=" + user?.email : "", {
     headers: {
       "Set-Cookie": await storage.destroySession(session),
     },
   });
+}
+
+export async function userExists(email: string) {
+  const user = await prisma.user.count({
+    where: { email },
+  });
+  return !!user;
 }
