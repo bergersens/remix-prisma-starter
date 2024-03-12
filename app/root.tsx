@@ -7,6 +7,7 @@ import {
 } from "@remix-run/react";
 import { Analytics } from "@vercel/analytics/react";
 import { LinksFunction } from "@vercel/remix";
+import { SpeedInsights } from "@vercel/speed-insights/remix";
 
 import globals from "./globals.css?url";
 export const links: LinksFunction = () => [
@@ -27,6 +28,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <ScrollRestoration />
         <Scripts />
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
