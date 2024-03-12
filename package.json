@@ -4,7 +4,7 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "build:dev": "remix vite:build",
+    "build": "npm run prisma:deploy && remix vite:build",
     "dev": "remix vite:dev",
     "typecheck": "tsc",
     "prisma:generate": "prisma generate",
