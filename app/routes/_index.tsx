@@ -1,4 +1,8 @@
-import type { MetaFunction } from "@vercel/remix";
+import { json, useLoaderData } from "@remix-run/react";
+import type { LoaderFunction, MetaFunction } from "@vercel/remix";
+import { Button } from "~/components/ui/button";
+import { getUser, requireUserId } from "~/utils/auth.server";
+import { RegisterForm } from "~/utils/types.server";
 
 export const meta: MetaFunction = () => {
   return [
@@ -7,35 +11,21 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+export const loader: LoaderFunction = async ({ request }) => {
+  await requireUserId(request);
+  const user = await getUser(request);
+  return json(user);
+};
+
 export default function Index() {
+  const loader = useLoaderData<RegisterForm | null>();
+
   return (
-    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
-      <h1>Welcome to Remix</h1>
-      <ul>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/blog"
-            rel="noreferrer"
-          >
-            15m Quickstart Blog Tutorial
-          </a>
-        </li>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/jokes"
-            rel="noreferrer"
-          >
-            Deep Dive Jokes App Tutorial
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
-            Remix Docs
-          </a>
-        </li>
-      </ul>
+    <div className="min-h-screen flex items-center justify-center w-full dark:bg-gray-950">
+      {loader?.email}
+      <form method="POST" action="/logout">
+        <Button type="submit">Logout</Button>
+      </form>
     </div>
   );
 }
