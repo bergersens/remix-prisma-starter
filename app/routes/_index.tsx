@@ -21,6 +21,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   await requireUserId(request);
 
   const user = await getUser(request);
+  console.log(user);
+
   return json(user);
 };
 
@@ -29,9 +31,13 @@ export default function Index() {
 
   return (
     <div className="min-h-screen flex items-center justify-center w-full dark:bg-gray-950">
-      {loaderData?.email}
       <form method="POST" action="/auth/logout">
-        <Button type="submit">Logout</Button>
+        <div className="flex flex-col">
+          {loaderData?.email}
+          <br />
+          {loaderData?.id}
+          <Button type="submit">Logout</Button>
+        </div>
       </form>
     </div>
   );

@@ -4,7 +4,7 @@ import { prisma } from "~/db.server";
 import { createCookieSessionStorage, json, redirect } from "@remix-run/node";
 
 import type { User } from "@prisma/client";
-import { createUser } from "./user.server";
+import { createOauthUser, createUser } from "./user.server";
 
 const sessionSecret = process.env.SESSION_SECRET;
 if (!sessionSecret) {
@@ -34,7 +34,9 @@ export async function createUserSession(userId: string, redirectTo: string) {
 }
 
 export async function register(
-  user: Pick<User, "email" | "firstName" | "lastName" | "password">
+  user: Pick<User, "email" | "firstName" | "lastName" | "password"> & {
+    password: string;
+  }
 ) {
   const exists = await prisma.user.count({ where: { email: user.email } });
   if (exists) {
@@ -62,7 +64,12 @@ export async function login({
     where: { email },
   });
 
-  if (!user || !(await bcrypt.compare(password, user.password)))
+  if (
+    !user ||
+    (password &&
+      user.password &&
+      !(await bcrypt.compare(password, user.password)))
+  )
     return json({ error: `Incorrect login` }, { status: 400 });
 
   return createUserSession(user.id, "/");
@@ -125,4 +132,33 @@ export async function userExists(email: string) {
     where: { email },
   });
   return !!user;
+}
+
+export async function getUserbyEmail(email: string) {
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+  return user;
+}
+
+export async function registerOrLoginGoogle(
+  user: Pick<User, "email" | "firstName" | "lastName">
+) {
+  const dbUser = await getUserbyEmail(user.email);
+
+  if (dbUser) {
+    return createUserSession(dbUser.id, "/");
+  }
+
+  const newUser = await createOauthUser(user);
+  if (!newUser) {
+    return json(
+      {
+        error: `cannot-create-user`,
+      },
+      { status: 400 }
+    );
+  }
+
+  return createUserSession(newUser.id, "/");
 }

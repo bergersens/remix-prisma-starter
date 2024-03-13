@@ -5,7 +5,13 @@ import type {
   TypedResponse,
 } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useNavigation,
+} from "@remix-run/react";
+import { Loader2 } from "lucide-react";
 import type { z } from "zod";
 import { Button } from "~/components/ui/button";
 import {
@@ -57,6 +63,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export default function Login() {
   const actionData = useActionData<typeof action>();
   const email = useLoaderData<typeof loader>();
+  const { state } = useNavigation();
 
   return (
     <Form method="POST">
@@ -117,7 +124,14 @@ export default function Login() {
             />
           </div>
 
-          <Button className="w-full" type="submit">
+          <Button
+            className="w-full"
+            type="submit"
+            disabled={state === "submitting"}
+          >
+            {state === "submitting" && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
             Register
           </Button>
         </div>
