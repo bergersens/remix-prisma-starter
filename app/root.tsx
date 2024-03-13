@@ -6,9 +6,10 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import { Analytics } from "@vercel/analytics/react";
-import { LinksFunction } from "@vercel/remix";
+import type { LinksFunction } from "@vercel/remix";
 import { SpeedInsights } from "@vercel/speed-insights/remix";
 
+import { GlobalLoading } from "./components/GlobalProgress";
 import globals from "./globals.css?url";
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: globals },
@@ -29,6 +30,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Scripts />
         <Analytics />
         <SpeedInsights />
+        <GlobalLoading />n
       </body>
     </html>
   );
