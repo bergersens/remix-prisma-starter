@@ -1,8 +1,12 @@
 import { Label } from "@radix-ui/react-label";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import type {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  TypedResponse,
+} from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
-import { z } from "zod";
+import type { z } from "zod";
 import { Button } from "~/components/ui/button";
 import {
   CardContent,
@@ -11,23 +15,22 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
+import { RegisterForm } from "~/models/auth.model.server";
 import { getUser, register } from "~/utils/auth.server";
 
-const schema = z.object({
-  email: z
-    .string({ required_error: "E-mail must be set" })
-    .email("Email does not match"),
-  password: z
-    .string({ required_error: "Password must be set." })
-    .min(5, "Password must be more than 5 characters long"),
-  firstName: z.string({ required_error: "First name must be set." }),
-  lastName: z.string({ required_error: "Last name must be set." }),
-});
-
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({
+  request,
+}: ActionFunctionArgs): Promise<
+  TypedResponse<{
+    error: string;
+    fieldErrors?: z.typeToFlattenedError<
+      z.infer<typeof RegisterForm>
+    >["fieldErrors"];
+  }>
+> => {
   const payload = await request.formData();
 
-  const result = schema.safeParse(Object.fromEntries(payload));
+  const result = RegisterForm.safeParse(Object.fromEntries(payload));
 
   if (!result.success) {
     return json(
@@ -39,7 +42,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       { status: 400 }
     );
   }
-
   return await register(result.data);
 };
 
@@ -53,11 +55,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export default function Login() {
-  const actionData = useActionData<{
-    error?: string;
-    payload?: FormData;
-    fieldErrors: z.inferFlattenedErrors<typeof schema>["fieldErrors"];
-  }>();
+  const actionData = useActionData<typeof action>();
   const email = useLoaderData<typeof loader>();
 
   return (
@@ -92,7 +90,7 @@ export default function Login() {
               name="password"
               autoFocus={!!email}
               className={
-                actionData?.fieldErrors.password ? "border-red-500" : ""
+                actionData?.fieldErrors?.password ? "border-red-500" : ""
               }
             />
           </div>
@@ -103,7 +101,7 @@ export default function Login() {
               required
               name="firstName"
               className={
-                actionData?.fieldErrors.firstName ? "border-red-500" : ""
+                actionData?.fieldErrors?.firstName ? "border-red-500" : ""
               }
             />
           </div>
@@ -114,7 +112,7 @@ export default function Login() {
               required
               name="lastName"
               className={
-                actionData?.fieldErrors.lastName ? "border-red-500" : ""
+                actionData?.fieldErrors?.lastName ? "border-red-500" : ""
               }
             />
           </div>

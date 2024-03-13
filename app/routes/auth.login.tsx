@@ -1,9 +1,12 @@
 import { Label } from "@radix-ui/react-label";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import type {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  TypedResponse,
+} from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
-import { z } from "zod";
-import { zfd } from "zod-form-data";
+import type { z } from "zod";
 import { Button } from "~/components/ui/button";
 import {
   CardContent,
@@ -12,30 +15,28 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
+import { LoginForm } from "~/models/auth.model.server";
 import { getUser, login } from "~/utils/auth.server";
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({
+  request,
+}: ActionFunctionArgs): Promise<
+  TypedResponse<{
+    error: string;
+    fieldErrors?: z.typeToFlattenedError<
+      z.infer<typeof LoginForm>
+    >["fieldErrors"];
+  }>
+> => {
   const payload = await request.formData();
 
-  const schema = zfd.formData({
-    email: zfd.text(
-      z
-        .string({ required_error: "E-mail must be set" })
-        .email("Email does not match")
-    ),
-    password: zfd.text(
-      z
-        .string({ required_error: "Password must be set." })
-        .min(5, "Password must be more than 5 characters long")
-    ),
-  });
-
-  const result = schema.safeParse(payload);
+  const result = LoginForm.safeParse(Object.fromEntries(payload));
 
   if (!result.success) {
     return json(
       {
-        error: result.error.flatten(),
+        error: "form-validation",
+        fieldErrors: result.error.flatten().fieldErrors,
         payload,
       },
       { status: 400 }

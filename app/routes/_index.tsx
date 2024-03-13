@@ -23,7 +23,7 @@ export default function Index() {
     <div className="min-h-screen flex items-center justify-center w-full dark:bg-gray-950">
       {loaderData?.email}
       <form method="POST" action="/auth/logout">
-        <Button type="submit">Antonia ist schlecht</Button>
+        <Button type="submit">Logout</Button>
       </form>
     </div>
   );
