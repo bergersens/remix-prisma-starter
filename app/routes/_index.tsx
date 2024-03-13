@@ -1,6 +1,7 @@
 import { json, useLoaderData } from "@remix-run/react";
 import type { LoaderFunctionArgs, MetaFunction } from "@vercel/remix";
 import { Button } from "~/components/ui/button";
+import { parseAcceptLanguageHeader } from "~/lib/utils";
 import { getUser, requireUserId } from "~/utils/auth.server";
 
 export const meta: MetaFunction = () => {
@@ -11,7 +12,14 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const lang = parseAcceptLanguageHeader(
+    request.headers.get("Accept-Language")
+  );
+
+  console.log(lang);
+
   await requireUserId(request);
+
   const user = await getUser(request);
   return json(user);
 };
