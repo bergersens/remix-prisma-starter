@@ -14,7 +14,7 @@ import {
 import { requireUserId } from "~/lib/server/auth.server";
 
 export const config = {
-  maxDuration: 60,
+  maxDuration: 10,
 };
 
 const schema = z.object({

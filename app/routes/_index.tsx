@@ -58,7 +58,7 @@ export default function Index() {
           }}
         />
 
-        <Form method="post" action={`/recipe?${searchParams}`}>
+        <Form method="get" action={`/recipe?${searchParams}`}>
           <Button className="w-full mt-6" size="lg" type="submit">
             Los gehts
           </Button>
