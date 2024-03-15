@@ -13,6 +13,10 @@ import {
 } from "~/components/ui/card";
 import { requireUserId } from "~/lib/server/auth.server";
 
+export const config = {
+  maxDuration: 60,
+};
+
 const schema = z.object({
   title: z
     .string()
