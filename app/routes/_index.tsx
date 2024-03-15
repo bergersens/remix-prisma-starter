@@ -29,7 +29,11 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   return json(user);
 };
-
+const autocompleteOptions: Tag[] = [
+  { id: "nice", text: "Nudeln" },
+  { id: "nice", text: "Tomaten" },
+  { id: "nice", text: "Eier" },
+];
 export default function Index() {
   const loaderData = useLoaderData<typeof loader>();
 
@@ -37,19 +41,13 @@ export default function Index() {
 
   const searchParams = new URLSearchParams(tags.map((s) => ["id", s.text]));
 
-  const autocompleteoptions: Tag[] = [
-    { text: "cool", id: "noerxce" },
-    { text: "corfxol", id: "noxcex" },
-    { text: "Juhu", id: "nxoxxcex" },
-  ];
-
   return (
     <div className="h-screen">
       <Header user={{ name: loaderData?.firstName }} />
       <div className="mt-24 flex flex-col items-center justify-center max-w-3xl mx-auto dark:bg-gray-950">
         <TagInput
+          autocompleteOptions={autocompleteOptions}
           enableAutocomplete={true}
-          autocompleteOptions={autocompleteoptions}
           size="lg"
           placeholder="Welche Zutaten hast du noch?"
           tags={tags}

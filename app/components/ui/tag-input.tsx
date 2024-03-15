@@ -2,13 +2,7 @@ import { type VariantProps } from "class-variance-authority";
 import type { FC, PropsWithChildren } from "react";
 import React from "react";
 import { v4 as uuid } from "uuid";
-import {
-  Command,
-  CommandEmpty,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "./command";
+import { Command, CommandInput, CommandItem, CommandList } from "./command";
 import { Tag, type tagVariants } from "./tag";
 
 type OmittedInputProps = Omit<
@@ -120,7 +114,6 @@ export const TagInput: FC<PropsWithChildren<TagInputProps>> = (props) => {
             list={enableAutocomplete ? "autocomplete-options" : undefined}
           />
           <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
             {autocompleteOptions
               ?.filter((option) => !tags.some((tag) => tag.id === option.id))
               .map(({ text, id }) => (
