@@ -1,4 +1,4 @@
-import { Form, json, useLoaderData } from "@remix-run/react";
+import { Link, json, useLoaderData } from "@remix-run/react";
 import type { LoaderFunctionArgs, MetaFunction } from "@vercel/remix";
 import { useState } from "react";
 import { Header } from "~/components/Header";
@@ -58,11 +58,11 @@ export default function Index() {
           }}
         />
 
-        <Form method="get" action={`/recipe?${searchParams}`}>
+        <Link to={`/recipe?${searchParams}`}>
           <Button className="w-full mt-6" size="lg" type="submit">
             Los gehts
           </Button>
-        </Form>
+        </Link>
       </div>
     </div>
   );
