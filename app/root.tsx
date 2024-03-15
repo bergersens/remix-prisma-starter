@@ -30,7 +30,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Scripts />
         <Analytics />
         <SpeedInsights />
-        <GlobalLoading />n
+        <GlobalLoading />
       </body>
     </html>
   );

@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 
 import type { User } from "@prisma/client";
-import { prisma } from "~/db.server";
+import { prisma } from "~/lib/server/db.server";
 
 export const createUser = async (
   user: Pick<User, "email" | "firstName" | "lastName" | "password"> & {

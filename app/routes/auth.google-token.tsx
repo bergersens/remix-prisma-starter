@@ -1,6 +1,6 @@
 import { redirect, type LoaderFunctionArgs } from "@remix-run/node";
 import { google } from "googleapis";
-import { registerOrLoginGoogle } from "~/utils/auth.server";
+import { registerOrLoginGoogle } from "~/lib/server/auth.server";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   console.log("token exchange");

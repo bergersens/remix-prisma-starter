@@ -21,8 +21,8 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
-import { RegisterForm } from "~/models/auth.model.server";
-import { getUser, register } from "~/utils/auth.server";
+import { getUser, register } from "~/lib/server/auth.server";
+import { RegisterForm } from "~/lib/server/models/auth.model.server";
 
 export const action = async ({
   request,

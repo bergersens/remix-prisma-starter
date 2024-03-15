@@ -14,7 +14,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   };
 
   return json(
-    { message: "Hello World" + new Date().toISOString() },
+    { message: `Hello World${new Date().toISOString()}` },
     { status: 200, headers }
   );
 };

@@ -3,7 +3,6 @@ import { json, redirect } from "@remix-run/node";
 import { Form, Link, useNavigation } from "@remix-run/react";
 import { Loader2, Mail } from "lucide-react";
 import { z } from "zod";
-import { zfd } from "zod-form-data";
 import { Button } from "~/components/ui/button";
 import {
   CardContent,
@@ -12,17 +11,15 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
-import { userExists } from "~/utils/auth.server";
+import { userExists } from "~/lib/server/auth.server";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const payload = await request.formData();
 
-  const schema = zfd.formData({
-    email: zfd.text(
-      z
-        .string({ required_error: "E-mail must be set" })
-        .email("Email does not match")
-    ),
+  const schema = z.object({
+    email: z
+      .string({ required_error: "E-mail must be set" })
+      .email("Email does not match"),
   });
 
   const result = schema.safeParse(payload);
@@ -40,8 +37,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const isUser = await userExists(result.data.email);
 
   if (isUser) {
-    return redirect("/auth/login?email=" + result.data.email);
-  } else return redirect("/auth/register?email=" + result.data.email);
+    return redirect(`/auth/login?email=${result.data.email}`);
+  } else return redirect(`/auth/register?email=${result.data.email}`);
 };
 
 export default function Auth() {
@@ -80,7 +77,7 @@ export default function Auth() {
 
           <CardDescription className="text-center py-2">- or -</CardDescription>
 
-          <Link to={"/auth/google"}>
+          <Link to="/auth/google">
             <Button variant="google" className="w-full">
               {state === "submitting" ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -3,7 +3,7 @@ import { Outlet } from "@remix-run/react";
 import type { LoaderFunction } from "@vercel/remix";
 import type { PropsWithChildren } from "react";
 import { Card } from "~/components/ui/card";
-import { getUser } from "~/utils/auth.server";
+import { getUser } from "~/lib/server/auth.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
   // If there's already a user in the session, redirect to the home page

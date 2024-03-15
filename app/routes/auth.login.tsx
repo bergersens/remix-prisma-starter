@@ -21,8 +21,8 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
-import { LoginForm } from "~/models/auth.model.server";
-import { getUser, login } from "~/utils/auth.server";
+import { getUser, login } from "~/lib/server/auth.server";
+import { LoginForm } from "~/lib/server/models/auth.model.server";
 
 export const action = async ({
   request,

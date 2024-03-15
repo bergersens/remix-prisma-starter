@@ -1,10 +1,10 @@
 import bcrypt from "bcryptjs";
-import { prisma } from "~/db.server";
+import { prisma } from "~/lib/server/db.server";
 
 import { createCookieSessionStorage, json, redirect } from "@remix-run/node";
 
 import type { User } from "@prisma/client";
-import { createOauthUser, createUser } from "./user.server";
+import { createOauthUser } from "./user.server";
 
 const sessionSecret = process.env.SESSION_SECRET;
 if (!sessionSecret) {
@@ -39,11 +39,11 @@ export async function register(
   }
 ) {
   const exists = await prisma.user.count({ where: { email: user.email } });
-  if (exists) {
+  if (exists || true) {
     return json({ error: `user-exists` }, { status: 400 });
   }
 
-  const newUser = await createUser(user);
+  /*  const newUser = await createUser(user);
   if (!newUser) {
     return json(
       {
@@ -53,7 +53,7 @@ export async function register(
     );
   }
 
-  return createUserSession(newUser.id, "/");
+  return createUserSession(newUser.id, "/"); */
 }
 
 export async function login({
@@ -108,7 +108,7 @@ export async function getUser(request: Request) {
   try {
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, email: true },
+      select: { id: true, email: true, firstName: true, lastName: true },
     });
     return user;
   } catch {
@@ -120,7 +120,7 @@ export async function logout(request: Request) {
   const session = await getUserSession(request);
   const user = await getUser(request);
 
-  return redirect("/auth/login" + user ? "?email=" + user?.email : "", {
+  return redirect(`/auth/login${user}` ? `?email=${user?.email}` : "", {
     headers: {
       "Set-Cookie": await storage.destroySession(session),
     },
